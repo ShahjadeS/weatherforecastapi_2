@@ -1,0 +1,78 @@
+{
+	"id": "e6fadd97-eba0-4bd0-8e0e-16c0852d93bb",
+	"values": [
+		{
+			"key": "baseURI",
+			"value": "https://online.actitime.com/cst68",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "userName",
+			"value": "shahjadecst68",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "passWord",
+			"value": "Shahjade@7388",
+			"type": "secret",
+			"enabled": true
+		},
+		{
+			"key": "customerId",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "projectId",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "taskId",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "OpenWeatherBaseURI",
+			"value": "https://api.openweathermap.org/data/2.5/weather",
+			"enabled": true
+		},
+		{
+			"key": "lat_val",
+			"value": "0",
+			"enabled": true
+		},
+		{
+			"key": "long_val",
+			"value": "0",
+			"enabled": true
+		},
+		{
+			"key": "lat_value",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "long_value",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "ForecastWeatherBaseURI",
+			"value": "https://api.open-meteo.com/v1/forecast",
+			"type": "default",
+			"enabled": true
+		}
+	],
+	"name": "Globals",
+	"_postman_variable_scope": "globals",
+	"_postman_exported_at": "2024-12-18T12:05:22.315Z",
+	"_postman_exported_using": "Postman/11.21.0"
+}
