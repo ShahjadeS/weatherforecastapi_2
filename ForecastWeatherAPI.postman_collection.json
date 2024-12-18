@@ -1,0 +1,178 @@
+{
+	"info": {
+		"_postman_id": "9656ff05-fc30-47bf-84c4-d83c72a82b1e",
+		"name": "ForecastWeatherAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33823745"
+	},
+	"item": [
+		{
+			"name": "ValidationAPI",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Define the expected URL and parameters with value rules\r",
+							"const expectedBaseUrl = \"https://api.open-meteo.com/v1/forecast\";\r",
+							"const expectedParams = {\r",
+							"    latitude: pm.collectionVariables.get(\"lat_value\"),\r",
+							"    longitude: pm.collectionVariables.get(\"long_value\"),\r",
+							"    current: \"temperature_2m,relative_humidity_2m\",\r",
+							"    hourly: \"temperature_2m,relative_humidity_2m,soil_temperature_6cm\",\r",
+							"    daily: \"temperature_2m_max,temperature_2m_min,precipitation_sum,rain_sum,precipitation_hours,precipitation_probability_max\",\r",
+							"    timezone: \"auto\"\r",
+							"};\r",
+							"\r",
+							"// Extract actual URL and parameters from the request\r",
+							"const actualUrl = pm.request.url.toString();\r",
+							"const actualBaseUrl = actualUrl.split(\"?\")[0];\r",
+							"const actualParams = pm.request.url.query.toObject();\r",
+							"\r",
+							"// Validation rules for key formats\r",
+							"const validateKeyFormat = (key) => {\r",
+							"    const validKeys = [\"latitude\", \"longitude\", \"current\", \"hourly\", \"daily\", \"timezone\"];\r",
+							"    if (!validKeys.includes(key)) {\r",
+							"        const closestKey = validKeys.find(validKey => \r",
+							"            validKey.startsWith(key.slice(0, 2)) || validKey.includes(key)\r",
+							"        );\r",
+							"        const suggestion = closestKey ? ` Did you mean \"${closestKey}\"?` : \"\";\r",
+							"        pm.test(`Invalid key: ${key}`, () => {\r",
+							"            pm.expect.fail(`\"${key}\" might be a spelling mistake.${suggestion} Valid key must be one of: ${validKeys.join(\", \")}`);\r",
+							"        });\r",
+							"        return false;\r",
+							"    } else if (/^\\d+$/.test(key)) {\r",
+							"        pm.test(`Key format error: ${key}`, () => {\r",
+							"            pm.expect.fail(`\"${key}\" is an Integer format. Valid key must be a String it is one of, e.g., \"latitude\", \"longitude\", \"current\", \"hourly\", \"daily\", \"timezone\".`);\r",
+							"        });\r",
+							"        return false;\r",
+							"    } else if (/^\\d+\\.\\d+$/.test(key)) {\r",
+							"        pm.test(`Key format error: ${key}`, () => {\r",
+							"            pm.expect.fail(`\"${key}\" is a Float format. Valid key must be a String, e.g., \"latitude\", \"longitude\", \"current\", \"hourly\", \"daily\", \"timezone\".`);\r",
+							"        });\r",
+							"        return false;\r",
+							"    } else if (/[^a-zA-Z_]/.test(key)) {\r",
+							"        pm.test(`Key format error: ${key}`, () => {\r",
+							"            pm.expect.fail(`\"${key}\" contains invalid characters. Valid key must be a String, e.g., \"latitude\", \"longitude\", \"current\", \"hourly\", \"daily\", \"timezone\".`);\r",
+							"        });\r",
+							"        return false;\r",
+							"    }\r",
+							"    return true;\r",
+							"};\r",
+							"\r",
+							"// Validation rules for parameter values\r",
+							"const validateValue = (key, value) => {\r",
+							"    switch (key) {\r",
+							"        case \"latitude\":\r",
+							"            const latitude = parseFloat(value);\r",
+							"            return latitude >= -90 && latitude <= 90;\r",
+							"        case \"longitude\":\r",
+							"            const longitude = parseFloat(value);\r",
+							"            return longitude >= -180 && longitude <= 180;\r",
+							"        case \"current\":\r",
+							"            const currentValues = value.split(\",\");\r",
+							"            return currentValues.every(val => [\"temperature_2m\", \"relative_humidity_2m\"].includes(val));\r",
+							"        case \"hourly\":\r",
+							"            const hourlyValues = value.split(\",\");\r",
+							"            return hourlyValues.every(val => [\"temperature_2m\", \"relative_humidity_2m\", \"soil_temperature_6cm\"].includes(val));\r",
+							"        case \"daily\":\r",
+							"            const dailyValues = value.split(\",\");\r",
+							"            return dailyValues.every(val => [\r",
+							"                \"temperature_2m_max\",\r",
+							"                \"temperature_2m_min\",\r",
+							"                \"precipitation_sum\",\r",
+							"                \"rain_sum\",\r",
+							"                \"precipitation_hours\",\r",
+							"                \"precipitation_probability_max\"\r",
+							"            ].includes(val));\r",
+							"        case \"timezone\":\r",
+							"            return value === \"auto\";\r",
+							"        default:\r",
+							"            return false;\r",
+							"    }\r",
+							"};\r",
+							"\r",
+							"// Enhanced function to validate query parameters\r",
+							"function validateQueryParams(expected, actual) {\r",
+							"    Object.keys(actual).forEach(key => {\r",
+							"        const isKeyValid = validateKeyFormat(key);\r",
+							"\r",
+							"        pm.test(`Validation for key: ${key}`, () => {\r",
+							"            if (!isKeyValid) {\r",
+							"                pm.expect.fail(`Invalid key \"${key}\" found in query parameters.`);\r",
+							"            } else {\r",
+							"                // Key should exist in expected params\r",
+							"                pm.expect(expected).to.have.property(key);\r",
+							"\r",
+							"                // Value should match rules if key is valid\r",
+							"                const isValueValid = validateValue(key, actual[key]);\r",
+							"                if (!isValueValid) {\r",
+							"                    pm.expect.fail(`Invalid value for key \"${key}\": ${actual[key]}`);\r",
+							"                }\r",
+							"            }\r",
+							"        });\r",
+							"    });\r",
+							"\r",
+							"    pm.test(\"No extra keys in query parameters\", () => {\r",
+							"        pm.expect(Object.keys(actual).length).to.eql(Object.keys(expected).length);\r",
+							"    });\r",
+							"}\r",
+							"\r",
+							"// Validate base URL\r",
+							"pm.test(\"Base URL validation\", () => {\r",
+							"    pm.expect(actualBaseUrl).to.eql(expectedBaseUrl);\r",
+							"});\r",
+							"\r",
+							"// Validate query parameters\r",
+							"validateQueryParams(expectedParams, actualParams);\r",
+							"\r",
+							"// Ensure API response is successful\r",
+							"pm.test(\"API response is successful\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{ForecastWeatherBaseURI}}?latitude={{lat_value}}&longitude={{long_value}}&current=temperature_2m&hourly=temperature_2m,relative_humidity_2m&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,rain_sum,precipitation_hours&timezone=auto",
+					"host": [
+						"{{ForecastWeatherBaseURI}}"
+					],
+					"query": [
+						{
+							"key": "latitude",
+							"value": "{{lat_value}}"
+						},
+						{
+							"key": "longitude",
+							"value": "{{long_value}}"
+						},
+						{
+							"key": "current",
+							"value": "temperature_2m"
+						},
+						{
+							"key": "hourly",
+							"value": "temperature_2m,relative_humidity_2m"
+						},
+						{
+							"key": "daily",
+							"value": "temperature_2m_max,temperature_2m_min,precipitation_sum,rain_sum,precipitation_hours"
+						},
+						{
+							"key": "timezone",
+							"value": "auto"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
