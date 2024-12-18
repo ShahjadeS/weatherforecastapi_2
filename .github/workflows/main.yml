@@ -1,0 +1,25 @@
+name: API Tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository code
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Install Newman globally
+      - name: Install Newman
+        run: npm install -g newman
+
+      # Run Newman tests with the specified collection and globals files
+      - name: Run Newman tests
+        run: |
+          newman run ForecastWeather API.postman_collection.json \
+            --globals workspace.postman_globals.json \
+            -r cli
