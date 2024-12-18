@@ -54,13 +54,13 @@
 		},
 		{
 			"key": "lat_value",
-			"value": "",
+			"value": "90",
 			"type": "default",
 			"enabled": true
 		},
 		{
 			"key": "long_value",
-			"value": "",
+			"value": "180",
 			"type": "default",
 			"enabled": true
 		},
