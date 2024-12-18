@@ -20,6 +20,6 @@ jobs:
       # Run Newman tests with the specified collection and globals files
       - name: Run Newman tests
         run: |
-          newman run ForecastWeather API.postman_collection.json \
+          newman run ForecastWeatherAPI.postman_collection.json \
             --globals workspace.postman_globals.json \
             -r cli
